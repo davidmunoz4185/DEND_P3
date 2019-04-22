@@ -61,15 +61,15 @@ staging_songs_table_create = ("""
 songplay_table_create = ("""
     CREATE TABLE IF NOT EXISTS songplays
     (
-        songplay_id INT IDENTITY(0,1), 
+        songplay_id INT IDENTITY(0,1) PRIMARY KEY, 
         start_time numeric not null,  
         user_id int not null, 
-        level varchar(4) not null,  
+        level varchar(4),  
         song_id VARCHAR(18) not null distkey, 
         artist_id VARCHAR(18) not null sortkey, 
-        session_id int not null, 
-        location VARCHAR(1000) not null, 
-        user_agent varchar(150) not null
+        session_id int, 
+        location VARCHAR(1000), 
+        user_agent varchar(150)
     )
     ;
 """)
@@ -77,11 +77,11 @@ songplay_table_create = ("""
 user_table_create = ("""
     CREATE TABLE IF NOT EXISTS users
     (
-        user_id int NOT NULL PRIMARY KEY sortkey,
-        first_name varchar(25) not null,
-        last_name varchar(25) not null,
-        gender char(1) not null,
-        level varchar(4) not null
+        user_id int PRIMARY KEY sortkey,
+        first_name varchar(25),
+        last_name varchar(25),
+        gender char(1),
+        level varchar(4)
     )
     ;
 """)
@@ -89,7 +89,7 @@ user_table_create = ("""
 song_table_create = ("""
     CREATE TABLE IF NOT EXISTS songs
     (
-        song_id varchar NOT NULL PRIMARY KEY distkey,
+        song_id varchar PRIMARY KEY distkey,
         title varchar(350) not null,
         artist_id varchar(18) not null sortkey,
         year int not null,
@@ -101,9 +101,9 @@ song_table_create = ("""
 artist_table_create = ("""
     CREATE TABLE IF NOT EXISTS artists
     (
-        artist_id varchar(18) NOT NULL distkey, 
-        name varchar(500) not null sortkey,
-        location varchar(1000) not null,
+        artist_id varchar(18) PRIMARY KEY distkey, 
+        name varchar(500) sortkey,
+        location varchar(1000),
         lattitude varchar(25),
         longitude varchar(25)
     )
@@ -113,13 +113,13 @@ artist_table_create = ("""
 time_table_create = ("""
     CREATE TABLE IF NOT EXISTS time
     (
-        start_time timestamp NOT NULL sortkey,
-        hour int not null,
-        day int not null,
-        week int not null,
-        month int not null,
-        year int not null,
-        weekday varchar not null
+        start_time timestamp PRIMARY KEY sortkey,
+        hour int,
+        day int,
+        week int,
+        month int,
+        year int,
+        weekday varchar
     )
     ;
 """)
@@ -171,7 +171,7 @@ user_table_insert = ("""
     (
         user_id, first_name, last_name, gender, level
     )
-    SELECT userid,
+    SELECT DISTINCT userid,
     firstname,
     lastname,
     gender,
@@ -190,7 +190,7 @@ song_table_insert = ("""
         year,
         duration
     )
-    SELECT song_id,
+    SELECT DISTINCT song_id,
     title,
     artist_id,
     year,
@@ -209,7 +209,7 @@ artist_table_insert = ("""
         lattitude,
         longitude
     )
-    SELECT artist_id,
+    SELECT DISTINCT artist_id,
     artist_name,
     artist_location,
     artist_lattitude,
@@ -230,7 +230,7 @@ time_table_insert = ("""
         year,
         weekday
     )
-    SELECT 
+    SELECT DISTINCT
     TIMESTAMP 'epoch' + ts::bigint/1000 * interval '1 second' as start_time,
     EXTRACT(hour from start_time),
     EXTRACT(day from start_time),
